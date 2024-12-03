@@ -1,0 +1,71 @@
+/*  recursive ! 
+    int dp( int pos, int sum, bool small) {
+        if ( sum > k ) return 0 ; 
+        if (pos == (int)num.size()) {
+            if (sum == k ) return 1;
+            return 0;
+        }
+        auto rt = memo[small][sum][pos]; 
+        if (rt  != -1) return rt;
+
+        int ans = 0;
+        int32_t limit = (small ? 9 : num[pos] - '0');
+        for (int digit = 0; digit <= limit; digit++) {
+            if (digit < limit) 
+                ans += dp( pos + 1, sum + (digit != 0) , true);
+            else
+                ans += dp(pos + 1, sum + (digit != 0) , small);
+        }
+        return rt = ans;
+    }
+
+    int count(string num ) {	
+        memset(memo, -1, sizeof(memo));
+        return dp(0, 0, false);
+    }
+*/
+void solve(){
+    int l , r ; 
+    cin  >> l >>r;  
+    int DP[2][5][20]  ;
+    int lnnn ; 
+    auto SolveIT_  =[&] ( string  num ){
+
+        memset(DP , 0 , sizeof DP ); 
+        lnnn = (int)num.size();
+        for ( int i = 0 ; i < 2 ; i++ ){
+            // base case ! 
+            DP[i][0][lnnn] = DP [i][1][lnnn] = DP [i][2][lnnn]= DP [i][3][lnnn] = 1  ;
+        }
+        for ( int i = lnnn -1 ; i >= 0 ; i--  ){
+            ff( CountDig , 3 , 0 ){
+                ff( istight  , 1 , 0 ){
+                    auto &rt = DP[istight][CountDig][i];
+                    if ( istight ){
+                        f ( dig , 0 , 9 ){
+                            int DigCheck =  CountDig + (dig != 0) ; 
+                            if ( DigCheck  <= 3 )
+                                rt += DP[istight][DigCheck][i+1]; 
+                        }
+                    }
+                    else {
+                        f ( dig , 0 , num[i]-'0' ){
+                            bool Tight = dig < (num[i]-'0'); 
+                            int DigCheck =  CountDig + (dig != 0) ; 
+                            if ( DigCheck  <= 3 )
+                                rt += DP[Tight][DigCheck][i+1]; 
+                        }
+                    }
+                }
+            }
+        }
+        // bcz already calculated at index i 
+        int answer = DP[0][0][0] ;
+        // dp[tight][cte][indxe]
+        // from [ 0 , index -1 ] how many 0 already have ( cte )
+        // we can place any number or no now ! 
+        return answer ; 
+    };
+        
+    print ( SolveIT_(to_string(r)) - SolveIT_(to_string(l-1)) ,"\n"  ); 
+}

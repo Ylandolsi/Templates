@@ -1,0 +1,69 @@
+// https://www.youtube.com/watch?v=PBd85U_C9uk
+https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa1VnbWxEVHNyZGRUVlFpNWZ5bzVpWlVoakJZd3xBQ3Jtc0tuYzBtdjJyaDFlanJrZEswdEFFV0FSdGxacS1fdGlUZzJIVTZmbmhXQWdZRHpWT1VyRnNsaXlKbUdfRlFlZXBGRHNjaU82UV9ON1gzRXBxV2E0dFgwMHRJVVZnMXlXcUx1X3owS1gwUXB2aWxtWW9tSQ&q=https%3A%2F%2Fgithub.com%2Fmitkonikov%2Fcompetitive%2Fblob%2Fmain%2FSegment%2520Trees%2FRange_Sum_Query_optimized.cpp&v=PBd85U_C9uk
+
+
+
+
+// how to use it !
+https://github.com/mitkonikov/competitive/blob/main/Segment%20Trees/Range_Sum_Query_optimized.cpp
+ struct Data {
+    ll value = NN;
+    Data() { value= NN; }
+    Data( int ee ) {value = ee;  }
+    void update(Data x) { value = max ( value  , x.value ) ; }
+    static Data merge(Data a, Data b) {
+        Data d;
+        d.value = max ( a.value , b.value ) ;
+        return d;
+    }
+};
+template <typename I>
+struct Tree {
+    Tree *l = 0, *r = 0;
+    I low, high;
+ 
+    Data d;
+ 
+    Tree(I L, I R) {
+        low = L;
+        high = R;
+    }
+    ~Tree() {
+        if (l) delete l;
+        if (r) delete r;
+    }
+    void update(I P, Data X) {
+        if (P + 1 <= low || high <= P) return;
+        if (P <= low && high <= P + 1) {
+            d.update(X);
+            return;
+        }
+        I mid = low + (high - low) / 2;
+        if (P < mid) {
+            if (!l) l = new Tree(low, mid);
+            l->update(P, X);
+        } else {
+            if (!r) r = new Tree(mid, high);
+            r->update(P, X);
+        }
+        d = Data::merge( (l ? l->d : Data()), (r ? r->d : Data()) ) ;
+    }
+    Data query(I L, I R) {
+        if (R <= low || high <= L) return {};
+        if (L <= low && high <= R) return d;
+        int mid = low + (high - low) / 2;
+        if (l && r) return Data::merge(l->query(L, R), r->query(L, R));
+        if (l) return Data::merge(l->query(L, R), Data());
+        if (r) return Data::merge(Data(), r->query(L, R));
+        return {};
+    }
+};
+ 
+
+
+
+
+
+
+
+
