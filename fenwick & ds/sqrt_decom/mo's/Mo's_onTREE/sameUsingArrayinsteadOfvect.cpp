@@ -8,6 +8,8 @@ int nodeFreq[N] , S[N] , E[N] , dep[N]; // frqof node , start , end , depth !
 const int SQ = 300 , LOG = 17 ;
 int anc[N][LOG]; 
 int FlatTree[2*N +1 ] ; 
+
+
 template < typename T = int , typename graphType = int , bool VAL_ON_EDGE = false >
 class MoTree {
 public:
@@ -22,55 +24,28 @@ public:
                 l = S[L] + VAL_ON_EDGE, r = S[R], lca = -1, queryIdx = QueryIdx;
             else
                 l = E[L], r = S[R], lca = LCA, queryIdx = QueryIdx;
-            //calcOrder(HilbertPow);
         }
 
-        //void calcOrder(int hilbert_pow) {
-          //  ord = MoTree::hilbertOrder(l, r, hilbert_pow, 0);
-        //}
-
-        // bool operator < (const Query& rhs) const {
-        //     return ord < rhs.ord;
-        // }
         bool operator < (const Query& rhs) const {
-            if ( l/SQ != rhs.l /SQ ){
-                return l/SQ < rhs.l/SQ; 
-            }
-            if ( (l/SQ) & 1 ){
-                return r > rhs.r;
-            } 
-            else {
-                r < rhs.r ; 
-            }
+            if ( l/SQ != rhs.l /SQ ) return l/SQ < rhs.l/SQ; 
+            
+            if ( (l/SQ) & 1 ) return r > rhs.r;
+            
+            else  r < rhs.r ; 
+            
         }
     };
 
     MoTree(  int root = 1) 
         : curr_l(1), curr_r(0), timer(1), ans(0)  {
         dfs(root);
-        // helbertPow = calcHilbertPow(2 * n + 1); 
     }
 
-    // static inline int64_t hilbertOrder(int x, int y, int pow, int rotate) {
-    //     if (pow == 0) return 0;
-    //     int hpow = 1 << (pow - 1);
-    //     int seg = (x < hpow) ? ((y < hpow) ? 0 : 3) : ((y < hpow) ? 1 : 2);
-    //     seg = (seg + rotate) & 3;
-    //     const int rotateDelta[4] = {3, 0, 0, 1};
-    //     int nx = x & (x ^ hpow), ny = y & (y ^ hpow);
-    //     int nrot = (rotate + rotateDelta[seg]) & 3;
-    //     int64_t subSquareSize = int64_t(1) << (2 * pow - 2);
-    //     int64_t ordd = seg * subSquareSize;
-    //     int64_t add = hilbertOrder(nx, ny, pow - 1, nrot);
-    //     ordd += (seg == 1 || seg == 2) ? add : (subSquareSize - add - 1);
-    //     return ordd;
-    // }
 
     void getData() {
         for (int i = 0, u, v; i < m && cin >> u >> v; i++)
         {
             queries.emplace_back(u, v, i, getLCA(u, v), helbertPow);
-            debug ( u , v  , i ); 
         }
         process();
     }
@@ -80,20 +55,19 @@ public:
 
         // start with the first query
         curr_l = queries[0].l, curr_r = queries[0].l - 1;
-        debug( queries.size()); 
         for (auto& q : queries) {
             setRange(q);
+
+
+            // GET ANS : 
+
 
             // if lca is -1 then the two nodes are in the same subtree
             if (~q.lca && !VAL_ON_EDGE) 
                 add(q.lca);
-            paa anse=  mn.query( 0 , N - 1   ) ;
-            int ansp = -1 ;
-            int mustbe = ( count_nodes ) / 2  + 1  ; 
-            debug (q.l , q.r ,count_nodes,  mustbe , anse.first  , anse.second ); 
-            if ( anse.first >= mustbe ){
-                ansp = anse.second ; 
-            }
+
+            
+            int ansp = sg.query(0,N) ;
 
             answers[q.queryIdx] = ansp;
         
@@ -173,16 +147,15 @@ private:
 
     inline void add(int u){
         count_nodes++ ;
-        debug ( u , N , compressed[1] ) ;
         int comp = compressed[u] ; 
-        mn.upd(comp , 1 ) ;
+        sg.upd(comp , 1 ) ;
 
     }
 
     inline void remove(int u){
         count_nodes--;
         int comp = compressed[u] ; 
-        mn.upd(comp , -1 ) ;
+        sg.upd(comp , -1 ) ;
     }
 
     inline void operation(int idx) {
@@ -201,11 +174,5 @@ private:
         int log = 0;
         while ((1 << log) <= max_n) log++;
         return log;
-    }
-
-    int calcHilbertPow(int max_n) const {
-        int pow = 0;
-        while ((1 << pow) < max_n) pow++;
-        return pow;
     }
 };
